@@ -6,6 +6,8 @@
 * **Bölüm:** Bilgisayar Programcılığı
 * **Üniversite:** Piri Reis Üniversitesi
 * **Ders:** MTH2005 Yazılım Test ve Kalitesi
+* Öğretim Görevlisi: Emrah SARIÇİÇEK
+Teslim Tarihi: 28/04/2026
 
 ---
 
