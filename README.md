@@ -6,8 +6,8 @@
 * **Bölüm:** Bilgisayar Programcılığı
 * **Üniversite:** Piri Reis Üniversitesi
 * **Ders:** MTH2005 Yazılım Test ve Kalitesi
-* Öğretim Görevlisi: Emrah SARIÇİÇEK
-* Teslim Tarihi: 28/04/2026
+* **Öğretim Görevlisi:** Emrah SARIÇİÇEK
+* **Teslim Tarihi:** 28/04/2026
 
 ---
 
@@ -32,9 +32,9 @@ Sistem, uçtan uca bir e-ticaret akışını (Ürün -> Sepet -> Ödeme) simüle
 
 Analiz derinliğini artırmak amacıyla sisteme aşağıdaki kritik hatalar eklenmiştir:
 
-1. **KDV Hesaplama Hatası (Cart.cs)**: Sepet toplamına eklenmesi gereken %18 KDV, operatör hatası nedeniyle toplam tutardan **çıkarılmaktadır (`-`)**.
-2. **Eksi Stok Kontrol Hatası (Product.cs)**: Ürün stoğu tükendiğinde veya yetersiz olduğunda sistem hata vermemekte, stoğun **eksi değerlere** düşmesine izin vermektedir.
-3. **Veri Kaybı Hatası (OrderService.cs)**: Ödeme yetersiz olduğunda sistem hata fırlatmadan hemen önce müşterinin sepetini tamamen temizleyerek **veri kaybına** neden olmaktadır.
+1. **Kargo Maliyet Hatası (Cart.cs)**: Sepet toplamına eklenmesi gereken sabit kargo ücreti (25.0m), operatör hatası nedeniyle toplam tutardan **çıkarılmaktadır (-)**.
+2. **Ödeme Sınır Değer Hatası (OrderService.cs)**: Müşterinin ödediği tutar sepet toplamına tam olarak eşit olsa dahi, sistem hatalı bir karşılaştırma operatörü nedeniyle ödemeyi **reddetmektedir**.
+3. **Stok Sınır Değer Hatası (Product.cs)**: Ürün stoğu tam olarak "1" olduğunda, sistem yanlış bir mantıkla stok yok uyarısı vermekte ve satışı engellemektedir.
 
 ---
 
@@ -44,29 +44,29 @@ NUnit kullanılarak hazırlanan 10 farklı senaryo sonucunda sistemin kararlıl�
 
 ### 🔴 BAŞARISIZ (FAIL) OLAN TESTLERİN ANALİZİ (4 Test)
 
-#### 1. `[White Box]` CartCalculateTotal_CorrectlyAppliesDiscountAndTax
-* **Açıklama:** KDV'nin toplama eklenmek yerine çıkarılması sonucu, beklenen tahsilat tutarı ile gerçek tutar uyuşmamaktadır.
+#### 1. `[White Box]` Cart_CalculateTotal_Shipping_Error
+* **Açıklama:** Kargo ücretinin toplama eklenmek yerine çıkarılması sonucu, beklenen tahsilat tutarı ile gerçek tutar uyuşmamaktadır.
 
-#### 2. `[Black Box]` ProductDecreaseStock_ThrowsWhenNegative
-* **Açıklama:** Stok sıfırken ürün düşülmeye çalışıldığında sistemin durmaması, sınır değer kontrol zafiyetini kanıtlamaktadır.
+#### 2. `[Black Box]` OrderService_Payment_Boundary_Match
+* **Açıklama:** Tam tutar ile yapılan ödemelerde sistemin hata vermesi, ödeme modülündeki sınır değer zafiyetini kanıtlamaktadır.
 
-#### 3. `[Gray Box]` CartPaymentError_ShouldNotClearCartState
-* **Açıklama:** Ödeme hatası durumunda sepetin sıfırlanması, sistemin iç durum (state) yönetimindeki hatayı yakalamıştır.
+#### 3. `[Gray Box]` Product_Stock_Boundary_Check
+* **Açıklama:** Stokta 1 adet ürün varken yapılan alımların reddedilmesi, sistemin iç durum (state) yönetimindeki hatayı yakalamıştır.
 
-#### 4. `[Integration Test]` MultipleProducts_CalculationAndPayment
-* **Açıklama:** Sepet ve Ödeme modülleri birlikte çalıştığında, KDV hatasının tüm sipariş maliyetini zincirleme olarak bozduğu tespit edilmiştir.
+#### 4. `[Integration Test]` MultiProduct_Total_Calculation_Fail
+* **Açıklama:** Kargo hatasının tüm sipariş maliyetini zincirleme olarak bozduğu tespit edilmiştir.
 
 ---
 
 ### 🟢 BAŞARILI (PASS) OLAN TESTLER (6 Test)
 
 Sistemin kararlı çalışan kısımları aşağıdaki 6 Pass testi ile doğrulanmıştır:
-1. `[White Box]` OrderServicePlaceOrder_UpdatesInnerState
-2. `[White Box]` CartRemoveProduct_ReducesCount
-3. `[Black Box] ` CartAddProduct_IncreasesCount
-4. `[Black Box] ` ProductDecreaseStock_ReducesStockCorrectly
-5. `[Gray Box]  ` OrderServicePlaceOrder_ValidOrderMustBeCheckoutState
-6. `[Integration]` AddProductToCart_And_PlaceOrderSuccessfully
+1. `[White Box]` OrderService_State_Transition
+2. `[White Box]` Cart_Remove_Product_Verification
+3. `[Black Box] ` Cart_Add_Product_Functionality
+4. `[Black Box] ` Product_Stock_Standard_Update
+5. `[Gray Box]  ` Order_Process_Status_Completed
+6. `[Integration]` EndToEnd_Order_Placement_Flow
 
 ---
 
